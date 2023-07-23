@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sistemas-noticias-deployment
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: sistema-noticias
+      labels:
+        app: sistema-noticias
+    spec:
+      containers:
+        - name: sistema-noticias-container
+          image: aluracursos/sistema-noticias:1
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                name: sistema-configmap  
+          livenessProbe:
+            httpGet:
+              path: / # caminho do  metodo que ele vai testar
+              port: 80
+            periodSeconds: 10   # periodo que ele vai fazer os teste
+            failureThreshold: 3 # quantas falas ele vai permitir
+            initialDelaySeconds: 20 # tempo que ele vai demorar para fazer o primeiro teste quando a aplicação subir
+          readnessProbe:
+            httpGet:
+              path: / # caminho do  metodo que ele vai testar
+              port: 80
+            periodSeconds: 10   # periodo que ele vai fazer os teste
+            failureThreshold: 5 # quantas falas ele vai permitir
+            initialDelaySeconds: 3 # tempo que ele vai demorar para fazer o primeiro teste quando a aplicação subir   
+  selector:
+    matchLabels:
+      app: sistema-noticias
